@@ -1,2 +1,3 @@
-# plugin
-Boilerplate plugin for beginning Bludit plugin development.
+# Boilerplate plugin
+
+A boilerplate plugin for beginning Bludit plugin development.

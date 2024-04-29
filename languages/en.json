@@ -1,0 +1,7 @@
+{
+	"plugin-data":
+	{
+		"name": "Plugin Boilerplate",
+		"description": "A head start in developing custom Bludit plugins."
+	}
+}
