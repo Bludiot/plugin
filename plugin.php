@@ -60,7 +60,7 @@ class Boilerplate extends Plugin {
 	public function get_files() {
 
 		// Plugin path.
-		$path = PATH_PLUGINS . 'boilerplate' . DS;
+		$path = $this->phpPath();
 
 		// Get plugin functions.
 		foreach ( glob( $path . 'includes/*.php' ) as $filename ) {
@@ -84,6 +84,12 @@ class Boilerplate extends Plugin {
 		$this->dbFields = [
 			'option_one' => true,
 			'option_two' => '',
+		];
+
+		// Array of custom hooks.
+		$this->customHooks = [
+			'hook_one',
+			'hook_two'
 		];
 
 		if ( ! $this->installed() ) {
@@ -140,7 +146,7 @@ class Boilerplate extends Plugin {
 
 			$assets .= '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/backend{$suffix}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
 
-			$assets .= '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/backend{$suffix}css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
+			$assets .= '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/backend{$suffix}.css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
 		endif;
 
 		return $assets;
@@ -220,7 +226,7 @@ class Boilerplate extends Plugin {
 
 		$assets .= '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/frontend{$suffix}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
 
-		$assets .= '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/frontend{$suffix}css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
+		$assets .= '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/frontend{$suffix}.css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
 
 		return $assets;
 	}
