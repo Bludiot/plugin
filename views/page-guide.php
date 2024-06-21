@@ -12,7 +12,7 @@
 $form_page = DOMAIN_ADMIN . 'configure-plugin/Boilerplate';
 
 ?>
-<h1><span class="page-title-icon fa fa-book"></span> <span class="page-title-text"><?php $L->p( 'Boilerplate Guide' ) ?></span></h1>
+<h1><span class="page-title-icon fa fa-book"></span> <span class="page-title-text"><?php $L->p( 'Plugin Boilerplate Guide' ) ?></span></h1>
 
 <div class="alert alert-primary alert-cats-list" role="alert">
 	<p class="m-0"><?php $L->p( "Go to the <a href='{$form_page}'>boilerplate options</a> page." ); ?></p>

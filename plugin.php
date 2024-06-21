@@ -122,6 +122,33 @@ class Boilerplate extends Plugin {
 	}
 
 	/**
+	 * Admin controller
+	 *
+	 * Change the text of the `<title>` tag.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @global object $L The Language class.
+	 * @global array $layout
+	 * @global object $site The Site class.
+	 * @return string Returns the head content.
+	 */
+	public function adminController() {
+
+		// Access global variables.
+		global $L, $layout, $site;
+
+		// Title separator.
+		$sep = '|';
+
+		if ( isset( $_GET['page'] ) && 'dummy' == $_GET['page'] ) {
+			$layout['title'] = $L->get( 'Dummy Page' ) . " {$sep} " . $site->title();
+		} else {
+			$layout['title'] = $L->get( 'Plugin Boilerplate Guide' ) . " {$sep} " . $site->title();
+		}
+	}
+
+	/**
 	 * Admin scripts & styles
 	 *
 	 * @since  1.0.0
@@ -205,17 +232,34 @@ class Boilerplate extends Plugin {
 	}
 
 	/**
+	 * Login scripts & styles
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return string
+	 */
+	public function loginHead() {
+
+		// Maybe get non-minified assets.
+		$suffix = '';
+		if ( ! $this->debug_mode() ) {
+			$suffix = '.min';
+		}
+
+		$assets .= '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/login{$suffix}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
+		$assets = '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/login{$suffix}.css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
+
+		return $assets;
+	}
+
+	/**
 	 * Head section
 	 *
 	 * @since  1.0.0
 	 * @access public
-	 * @global object $url Url class.
 	 * @return string Returns the head content.
 	 */
 	public function siteHead() {
-
-		// Access global variables.
-		global $url;
 
 		// Maybe get non-minified assets.
 		$suffix = '.min';
