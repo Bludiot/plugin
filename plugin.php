@@ -16,7 +16,10 @@ if ( ! defined( 'BLUDIT' ) ) {
 
 // Access namespaced functions.
 use function Boilerplate\{
-	dummy_function
+	site,
+	url,
+	lang,
+	page
 };
 
 class Boilerplate extends Plugin {
@@ -73,13 +76,9 @@ class Boilerplate extends Plugin {
 	 *
 	 * @since  1.0.0
 	 * @access public
-	 * @global object $L Language class.
 	 * @return void
 	 */
 	public function init() {
-
-		// Access global variables.
-		global $L;
 
 		$this->dbFields = [
 			'option_one' => true,
@@ -104,14 +103,9 @@ class Boilerplate extends Plugin {
 	 *
 	 * @since  1.0.0
 	 * @access public
-	 * @global object $L Language class.
-	 * @global object $site Site class.
 	 * @return string Returns the markup of the form.
 	 */
 	public function form() {
-
-		// Access global variables.
-		global $L, $site;
 
 		$html  = '';
 		ob_start();
@@ -128,23 +122,21 @@ class Boilerplate extends Plugin {
 	 *
 	 * @since  1.0.0
 	 * @access public
-	 * @global object $L The Language class.
 	 * @global array $layout
-	 * @global object $site The Site class.
 	 * @return string Returns the head content.
 	 */
 	public function adminController() {
 
 		// Access global variables.
-		global $L, $layout, $site;
+		global $layout;
 
 		// Title separator.
 		$sep = '|';
 
 		if ( isset( $_GET['page'] ) && 'dummy' == $_GET['page'] ) {
-			$layout['title'] = $L->get( 'Dummy Page' ) . " {$sep} " . $site->title();
+			$layout['title'] = lang()->get( 'Dummy Page' ) . " {$sep} " . site()->title();
 		} else {
-			$layout['title'] = $L->get( 'Plugin Boilerplate Guide' ) . " {$sep} " . $site->title();
+			$layout['title'] = lang()->get( 'Plugin Boilerplate Guide' ) . " {$sep} " . site()->title();
 		}
 	}
 
@@ -153,13 +145,9 @@ class Boilerplate extends Plugin {
 	 *
 	 * @since  1.0.0
 	 * @access public
-	 * @global object $url Url class.
 	 * @return string Returns the head content.
 	 */
 	public function adminHead() {
-
-		// Access global variables.
-		global $url;
 
 		// Maybe get non-minified assets.
 		$suffix = '.min';
@@ -169,7 +157,7 @@ class Boilerplate extends Plugin {
 		$assets = '';
 
 		// Load only for this plugin's pages.
-		if ( str_contains( $url->slug(), $this->className() ) ) :
+		if ( str_contains( url()->slug(), $this->className() ) ) :
 
 			$assets .= '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/backend{$suffix}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
 
@@ -184,14 +172,9 @@ class Boilerplate extends Plugin {
 	 *
 	 * @since  1.0.0
 	 * @access public
-	 * @global object $L Language class.
-	 * @global object $site Site class.
 	 * @return string Returns the markup of the page.
 	 */
 	public function adminView() {
-
-		// Access global variables.
-		global $L, $site;
 
 		$html  = '';
 		ob_start();
@@ -208,25 +191,20 @@ class Boilerplate extends Plugin {
 	 *
 	 * @since  1.0.0
 	 * @access public
-	 * @global object $L Language class.
 	 * @return mixed
 	 */
 	public function adminSidebar() {
-
-		// Access global variables.
-		global $L;
 
 		// Check user role.
 		if ( ! checkRole( [ 'admin' ], false ) ) {
 			return;
 		}
 
-		$url = HTML_PATH_ADMIN_ROOT . 'configure-plugin/' . $this->className();
-
+		$url  = HTML_PATH_ADMIN_ROOT . 'configure-plugin/' . $this->className();
 		$html = sprintf(
 			'<a class="nav-link" href="%s"><span class="fa fa-code"></span>%s</a>',
 			$url,
-			$L->get( 'Boilerplate' )
+			lang()->get( 'Boilerplate' )
 		);
 		return $html;
 	}
@@ -280,14 +258,9 @@ class Boilerplate extends Plugin {
 	 *
 	 * @since  1.0.0
 	 * @access public
-	 * @global object $L Language class.
-	 * @global object $site Site class.
 	 * @return string Returns the sidebar markup.
 	 */
 	public function siteSidebar() {
-
-		// Access global variables.
-		global $L, $site;
 
 		$html  = '';
 		ob_start();
