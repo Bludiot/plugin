@@ -82,7 +82,7 @@ class Boilerplate extends Plugin {
 
 		$this->dbFields = [
 			'option_one' => true,
-			'option_two' => '',
+			'option_two' => 5,
 		];
 
 		// Array of custom hooks.
@@ -116,6 +116,25 @@ class Boilerplate extends Plugin {
 	}
 
 	/**
+	 * Minified asset
+	 *
+	 * Gets minified CSS and JavaScript files or
+	 * non-minified if in debug mode.
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return string Returns the `.min` suffix or empty.
+	 */
+	public function minify() {
+
+		$suffix = '.min';
+		if ( defined( 'DEBUG_MODE' ) && DEBUG_MODE ) {
+			$suffix = '';
+		}
+		return $suffix;
+	}
+
+	/**
 	 * Admin controller
 	 *
 	 * Change the text of the `<title>` tag.
@@ -131,12 +150,12 @@ class Boilerplate extends Plugin {
 		global $layout;
 
 		// Title separator.
-		$sep = '|';
+		$sep = ' | ';
 
 		if ( isset( $_GET['page'] ) && 'dummy' == $_GET['page'] ) {
-			$layout['title'] = lang()->get( 'Dummy Page' ) . " {$sep} " . site()->title();
+			$layout['title'] = lang()->get( 'Dummy Page' ) . "{$sep}" . site()->title();
 		} else {
-			$layout['title'] = lang()->get( 'Plugin Boilerplate Guide' ) . " {$sep} " . site()->title();
+			$layout['title'] = lang()->get( 'Plugin Boilerplate Guide' ) . "{$sep}" . site()->title();
 		}
 	}
 
@@ -149,19 +168,14 @@ class Boilerplate extends Plugin {
 	 */
 	public function adminHead() {
 
-		// Maybe get non-minified assets.
-		$suffix = '.min';
-		if ( defined( 'DEBUG_MODE' ) && DEBUG_MODE ) {
-			$suffix = '';
-		}
 		$assets = '';
 
 		// Load only for this plugin's pages.
 		if ( str_contains( url()->slug(), $this->className() ) ) :
 
-			$assets .= '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/backend{$suffix}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
+			$assets .= '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/backend{$this->minify()}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
 
-			$assets .= '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/backend{$suffix}.css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
+			$assets .= '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/backend{$this->minify()}.css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
 		endif;
 
 		return $assets;
@@ -218,14 +232,8 @@ class Boilerplate extends Plugin {
 	 */
 	public function loginHead() {
 
-		// Maybe get non-minified assets.
-		$suffix = '';
-		if ( ! $this->debug_mode() ) {
-			$suffix = '.min';
-		}
-
-		$assets .= '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/login{$suffix}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
-		$assets = '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/login{$suffix}.css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
+		$assets = '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/login{$this->minify()}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
+		$assets = '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/login{$this->minify()}.css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
 
 		return $assets;
 	}
@@ -239,16 +247,9 @@ class Boilerplate extends Plugin {
 	 */
 	public function siteHead() {
 
-		// Maybe get non-minified assets.
-		$suffix = '.min';
-		if ( defined( 'DEBUG_MODE' ) && DEBUG_MODE ) {
-			$suffix = '';
-		}
-		$assets = '';
+		$assets = '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/frontend{$this->minify()}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
 
-		$assets .= '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/frontend{$suffix}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
-
-		$assets .= '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/frontend{$suffix}.css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
+		$assets .= '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/frontend{$this->minify()}.css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
 
 		return $assets;
 	}
@@ -271,6 +272,28 @@ class Boilerplate extends Plugin {
 	}
 
 	/**
+	 * Hook one
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function hook_one() {
+		// Utilize the custom `hook_one` hook.
+	}
+
+	/**
+	 * Hook two
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function hook_two() {
+		// Utilize the custom `hook_two` hook.
+	}
+
+	/**
 	 * Option return functions
 	 *
 	 * @since  1.0.0
@@ -282,7 +305,7 @@ class Boilerplate extends Plugin {
 		return $this->getValue( 'option_one' );
 	}
 
-	// @return string
+	// @return integer
 	public function option_two() {
 		return $this->getValue( 'option_two' );
 	}
