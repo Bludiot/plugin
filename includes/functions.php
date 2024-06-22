@@ -428,6 +428,26 @@ function is_front_page() {
 }
 
 /**
+ * Text replace
+ *
+ * Replaces the `%replace%` variable in
+ * a language file string.
+ *
+ * @since  1.0.0
+ * @param  string $get The language string to get.
+ * @param  string $string The string to replace the variable.
+ * @return string Returns the modified string or the string
+ *                as is if the variable is not found.
+ */
+function text_replace( $get = '', $string = '' ) {
+
+	if ( strstr( lang()->get( $get ), '%replace%' ) ) {
+		return str_replace( '%replace%', $string, lang()->get( $get ) );
+	}
+	return lang()->get( $get );
+}
+
+/**
  * Auto paragraph
  *
  * Replaces double line breaks with paragraph elements.
