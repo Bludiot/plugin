@@ -1,10 +1,10 @@
 <?php
 /**
- * Boilerplate
+ * Meta Data
  *
  * Plugin core class, do not namespace.
  *
- * @package    Boilerplate
+ * @package    Meta Data
  * @subpackage Core
  * @since      1.0.0
  */
@@ -15,14 +15,25 @@ if ( ! defined( 'BLUDIT' ) ) {
 }
 
 // Access namespaced functions.
-use function Boilerplate\{
+use function Meta_Data\{
 	site,
-	url,
 	lang,
-	page
+	is_rtl,
+	meta_tags_standard,
+	meta_tags_schema,
+	meta_tags_open_graph,
+	meta_tags_twitter,
+	meta_tags_dublin_core,
+	title_tag,
+	meta_tag_language,
+	meta_tag_keywords,
+	meta_tag_title,
+	meta_tag_description,
+	meta_tag_author,
+	meta_tag_copyright
 };
 
-class Boilerplate extends Plugin {
+class Meta_Data extends Plugin {
 
 	/**
 	 * Constructor method
@@ -66,9 +77,7 @@ class Boilerplate extends Plugin {
 		$path = $this->phpPath();
 
 		// Get plugin functions.
-		foreach ( glob( $path . 'includes/*.php' ) as $filename ) {
-			require_once $filename;
-		}
+		require_once 'includes/functions.php';
 	}
 
 	/**
@@ -81,14 +90,50 @@ class Boilerplate extends Plugin {
 	public function init() {
 
 		$this->dbFields = [
-			'option_one' => true,
-			'option_two' => 5,
+			'title_sep'        => '|',
+			'custom_sep'       => '',
+			'default_ttag'     => '',
+			'loop_ttag'        => '',
+			'post_ttag'        => '',
+			'page_ttag'        => '',
+			'cat_ttag'         => '',
+			'tag_ttag'         => '',
+			'search_ttag'      => '',
+			'error_ttag'       => '',
+			'default_ttag_rtl' => '',
+			'loop_ttag_rtl'    => '',
+			'post_ttag_rtl'    => '',
+			'page_ttag_rtl'    => '',
+			'cat_ttag_rtl'     => '',
+			'tag_ttag_rtl'     => '',
+			'search_ttag_rtl'  => '',
+			'error_ttag_rtl'   => '',
+			'use_title_tag'    => true,
+			'meta_noindex'     => false,
+			'meta_keywords'    => '',
+			'meta_use_schema'  => true,
+			'meta_use_og'      => true,
+			'meta_use_twitter' => true,
+			'meta_use_dublin'  => false,
+			'meta_custom'      => '',
+			'footer_scripts'   => ''
 		];
 
 		// Array of custom hooks.
 		$this->customHooks = [
-			'hook_one',
-			'hook_two'
+			'all_meta_tags',
+			'standard_tags',
+			'schema_tags',
+			'open_graph_tags',
+			'twitter_tags',
+			'dublin_core_tags',
+			'meta_tag_title',
+			'meta_tag_language',
+			'meta_tag_keywords',
+			'meta_tag_title',
+			'meta_tag_description',
+			'meta_tag_author',
+			'meta_tag_copyright'
 		];
 
 		if ( ! $this->installed() ) {
@@ -103,9 +148,15 @@ class Boilerplate extends Plugin {
 	 *
 	 * @since  1.0.0
 	 * @access public
+	 * @global object $L Language class.
+	 * @global object $plugin Plugin class.
+	 * @global object $site Site class.
 	 * @return string Returns the markup of the form.
 	 */
 	public function form() {
+
+		// Access global variables.
+		global $L, $plugin, $site;
 
 		$html  = '';
 		ob_start();
@@ -153,32 +204,10 @@ class Boilerplate extends Plugin {
 		$sep = ' | ';
 
 		if ( isset( $_GET['page'] ) && 'dummy' == $_GET['page'] ) {
-			$layout['title'] = lang()->get( 'Dummy Page' ) . "{$sep}" . site()->title();
+			$layout['title'] = lang()->get( 'Meta Data' ) . "{$sep}" . site()->title();
 		} else {
-			$layout['title'] = lang()->get( 'Plugin Boilerplate Guide' ) . "{$sep}" . site()->title();
+			$layout['title'] = lang()->get( 'Meta Data Guide' ) . "{$sep}" . site()->title();
 		}
-	}
-
-	/**
-	 * Admin scripts & styles
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 * @return string Returns the head content.
-	 */
-	public function adminHead() {
-
-		$assets = '';
-
-		// Load only for this plugin's pages.
-		if ( str_contains( url()->slug(), $this->className() ) ) :
-
-			$assets .= '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/backend{$this->minify()}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
-
-			$assets .= '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/backend{$this->minify()}.css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
-		endif;
-
-		return $assets;
 	}
 
 	/**
@@ -218,24 +247,9 @@ class Boilerplate extends Plugin {
 		$html = sprintf(
 			'<a class="nav-link" href="%s"><span class="fa fa-code"></span>%s</a>',
 			$url,
-			lang()->get( 'Boilerplate' )
+			lang()->get( 'Meta Data' )
 		);
 		return $html;
-	}
-
-	/**
-	 * Login scripts & styles
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 * @return string
-	 */
-	public function loginHead() {
-
-		$assets = '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/login{$this->minify()}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
-		$assets = '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/login{$this->minify()}.css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
-
-		return $assets;
 	}
 
 	/**
@@ -247,51 +261,137 @@ class Boilerplate extends Plugin {
 	 */
 	public function siteHead() {
 
-		$assets = '<script type="text/javascript" src="' . $this->domainPath() . "assets/js/frontend{$this->minify()}.js?version=" . $this->getMetadata( 'version' ) . '"></script>' . PHP_EOL;
+		$meta  = "\r";
+		// $meta .= title_tag();
+		$meta .= meta_tags_standard();
 
-		$assets .= '<link rel="stylesheet" type="text/css" href="' . $this->domainPath() . "assets/css/frontend{$this->minify()}.css?version=" . $this->getMetadata( 'version' ) . '" />' . PHP_EOL;
+		if ( $this->meta_use_schema() ) {
+			$meta .= meta_tags_schema();
+		}
 
-		return $assets;
+		if ( $this->meta_use_og() ) {
+			$meta .= meta_tags_open_graph();
+		}
+
+		if ( $this->meta_use_twitter() ) {
+			$meta .= meta_tags_twitter();
+		}
+
+		if ( $this->meta_use_dublin() ) {
+			$meta .= meta_tags_dublin_core();
+		}
+		$meta .= "\r";
+
+		echo $meta;
 	}
 
 	/**
-	 * Sidebar list
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 * @return string Returns the sidebar markup.
-	 */
-	public function siteSidebar() {
-
-		$html  = '';
-		ob_start();
-		include( $this->phpPath() . '/views/site-sidebar.php' );
-		$html .= ob_get_clean();
-
-		return $html;
-	}
-
-	/**
-	 * Hook one
-	 *
-	 * @since  1.0.0
-	 * @access public
-	 * @return void
-	 */
-	public function hook_one() {
-		// Utilize the custom `hook_one` hook.
-	}
-
-	/**
-	 * Hook two
+	 * All meta tags hook
 	 *
 	 * @since  1.0.0
 	 * @access public
 	 * @return void
 	 */
-	public function hook_two() {
-		// Utilize the custom `hook_two` hook.
-	}
+	public function all_meta_tags() {}
+
+	/**
+	 * Standard tags hook
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function standard_tags() {}
+
+	/**
+	 * Schema tags hook
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function schema_tags() {}
+
+	/**
+	 * Open Graph tags hook
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function open_graph_tags() {}
+
+	/**
+	 * Twitter tags hook
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function twitter_tags() {}
+
+	/**
+	 * Dublin Core tags hook
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function dublin_core_tags() {}
+
+	/**
+	 * Language meta tag hook
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function meta_tag_language() {}
+
+	/**
+	 * Keywords meta tag hook
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function meta_tag_keywords() {}
+
+	/**
+	 * Title meta tag hook
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function meta_tag_title() {}
+
+	/**
+	 * Description meta tag hook
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function meta_tag_description() {}
+
+	/**
+	 * Author meta tag hook
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function meta_tag_author() {}
+
+	/**
+	 * Copyright meta tag hook
+	 *
+	 * @since  1.0.0
+	 * @access public
+	 * @return void
+	 */
+	public function meta_tag_copyright() {}
 
 	/**
 	 * Option return functions
@@ -300,13 +400,149 @@ class Boilerplate extends Plugin {
 	 * @access public
 	 */
 
-	// @return boolean
-	public function option_one() {
-		return $this->getValue( 'option_one' );
+	// @return string
+	public function title_sep() {
+
+		// Get field value;
+		$sep = $this->getValue( 'title_sep' );
+
+		// Reverse some for RTL languages.
+		if ( is_rtl() ) {
+			if ( '&gt;' === $sep ) {
+				$sep = '&lt;';
+			}
+			if ( '→' === $sep ) {
+				$sep = '←';
+			}
+			if ( '≫' === $sep ) {
+				$sep = '≪';
+			}
+		}
+		return $sep;
 	}
 
-	// @return integer
-	public function option_two() {
-		return $this->getValue( 'option_two' );
+	// @return string
+	public function custom_sep() {
+		return $this->getValue( 'custom_sep' );
+	}
+
+	// @return string
+	public function default_ttag() {
+		return $this->getValue( 'default_ttag' );
+	}
+
+	// @return string
+	public function loop_ttag() {
+		return $this->getValue( 'loop_ttag' );
+	}
+
+	// @return string
+	public function post_ttag() {
+		return $this->getValue( 'post_ttag' );
+	}
+
+	// @return string
+	public function page_ttag() {
+		return $this->getValue( 'page_ttag' );
+	}
+
+	// @return string
+	public function cat_ttag() {
+		return $this->getValue( 'cat_ttag' );
+	}
+
+	// @return string
+	public function tag_ttag() {
+		return $this->getValue( 'tag_ttag' );
+	}
+
+	// @return string
+	public function search_ttag() {
+		return $this->getValue( 'search_ttag' );
+	}
+
+	// @return string
+	public function error_ttag() {
+		return $this->getValue( 'error_ttag' );
+	}
+
+	// @return string
+	public function default_ttag_rtl() {
+		return $this->getValue( 'default_ttag_rtl' );
+	}
+
+	// @return string
+	public function loop_ttag_rtl() {
+		return $this->getValue( 'loop_ttag_rtl' );
+	}
+
+	// @return string
+	public function post_ttag_rtl() {
+		return $this->getValue( 'post_ttag_rtl' );
+	}
+
+	// @return string
+	public function page_ttag_rtl() {
+		return $this->getValue( 'page_ttag_rtl' );
+	}
+
+	// @return string
+	public function cat_ttag_rtl() {
+		return $this->getValue( 'cat_ttag_rtl' );
+	}
+
+	// @return string
+	public function tag_ttag_rtl() {
+		return $this->getValue( 'tag_ttag_rtl' );
+	}
+
+	// @return string
+	public function search_ttag_rtl() {
+		return $this->getValue( 'search_ttag_rtl' );
+	}
+
+	// @return string
+	public function error_ttag_rtl() {
+		return $this->getValue( 'error_ttag_rtl' );
+	}
+
+	// @return boolean
+	public function meta_noindex() {
+		return $this->getValue( 'meta_noindex' );
+	}
+
+	// @return string
+	public function meta_keywords() {
+		return $this->getValue( 'meta_keywords' );
+	}
+
+	// @return boolean
+	public function meta_use_schema() {
+		return $this->getValue( 'meta_use_schema' );
+	}
+
+	// @return boolean
+	public function meta_use_og() {
+		return $this->getValue( 'meta_use_og' );
+	}
+
+	// @return boolean
+	public function meta_use_twitter() {
+		return $this->getValue( 'meta_use_twitter' );
+	}
+
+	// @return boolean
+	public function meta_use_dublin() {
+		return $this->getValue( 'meta_use_dublin' );
+	}
+
+	// @return string
+	public function meta_custom() {
+		return "\n" . htmlspecialchars_decode( $this->getValue( 'meta_custom' ) ) . "\n";
+	}
+
+	// @return string
+	public function footer_scripts() {
+		return "\n" . htmlspecialchars_decode( $this->getValue( 'footer_scripts' ) ) . "\n";
 	}
 }

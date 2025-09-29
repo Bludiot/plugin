@@ -1,15 +1,15 @@
 <?php
 /**
- * Boilerplate guide
+ * Meta Data guide
  *
- * @package    Boilerplate
+ * @package    Meta Data
  * @subpackage Views
  * @category   Guides
  * @since      1.0.0
  */
 
 // Access namespaced functions.
-use function Boilerplate\{
+use function Meta_Data\{
 	lang
 };
 
@@ -17,10 +17,10 @@ use function Boilerplate\{
 $form_page = DOMAIN_ADMIN . 'configure-plugin/' . $this->className();
 
 ?>
-<h1><span class="page-title-icon fa fa-book"></span> <span class="page-title-text"><?php lang()->p( 'Plugin Boilerplate Guide' ) ?></span></h1>
+<h1><span class="page-title-icon fa fa-book"></span> <span class="page-title-text"><?php lang()->p( 'Meta Data Guide' ) ?></span></h1>
 
 <div class="alert alert-primary alert-cats-list" role="alert">
-	<p class="m-0"><?php lang()->p( "Go to the <a href='{$form_page}'>boilerplate options</a> page." ); ?></p>
+	<p class="m-0"><?php lang()->p( "Go to the <a href='{$form_page}'>Meta Data options</a> page." ); ?></p>
 </div>
 
 <nav class="mb-3">
