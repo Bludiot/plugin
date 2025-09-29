@@ -1,3 +1,3 @@
-# Boilerplate plugin
+# Meta Data
 
-A boilerplate plugin for beginning Bludit plugin development.
+A meta data plugin for Bludit CMS.
