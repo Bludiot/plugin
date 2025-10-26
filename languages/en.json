@@ -1,7 +1,7 @@
 {
 	"plugin-data":
 	{
-		"name": "Meta Data",
-		"description": "A meta data plugin for Bludit CMS."
+		"name": "Plugin Boilerplate",
+		"description": "A head start in developing custom Bludit plugins."
 	}
 }

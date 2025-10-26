@@ -1,0 +1,7 @@
+:root {
+  --sample-color: red;
+}
+
+.sample {
+  display: none;
+}

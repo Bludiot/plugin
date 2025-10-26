@@ -2,13 +2,13 @@
 /**
  * Functions
  *
- * @package    Meta Data
+ * @package    Boilerplate
  * @subpackage Core
  * @category   Functions
  * @since      1.0.0
  */
 
-namespace Meta_Data;
+namespace Boilerplate;
 
 // Stop if accessed directly.
 if ( ! defined( 'BLUDIT' ) ) {
@@ -24,7 +24,7 @@ if ( ! defined( 'BLUDIT' ) ) {
  * @return object Returns the class object.
  */
 function plugin() {
-	return new \Meta_Data();
+	return new \Boilerplate();
 }
 
 /**
@@ -180,24 +180,6 @@ function is_rtl( $langs = null, $rtl = [] ) {
 	}
 
 	if ( in_array( current_lang(), $rtl ) ) {
-		return true;
-	}
-	return false;
-}
-
-/**
- * System can search
- *
- * Checks if the system has search functionality.
- *
- * @since  1.0.0
- * @return boolean Returns true if a search plugin is activated.
- */
-function can_search() {
-	if (
-		getPlugin( 'Search_Forms' ) ||
-		getPlugin( 'pluginSearch' )
-	) {
 		return true;
 	}
 	return false;
@@ -385,7 +367,9 @@ function is_page() {
  */
 function is_search() {
 
-
+	if ( 'search' == url()->whereAmI() ) {
+		return true;
+	}
 	return false;
 }
 
@@ -401,226 +385,6 @@ function is_404() {
 		return true;
 	}
 	return false;
-}
-
-/**
- * Loop data
- *
- * Gets data for the loop, especially when
- * using a static front page.
- *
- * @since  1.0.0
- * @global array  $content array of site content
- * @global object $pages Pages class
- * @return array  Returns an array of loop data.
- */
-function loop_data() {
-
-	// Access global variables.
-	global $content, $pages;
-
-	// Null if in search results (global errors).
-	if ( is_search() ) {
-		return null;
-	}
-
-	// Posts loop type.
-	$loop_type = 'blog';
-	if ( configureight() ) {
-		$loop_type = configureight()->loop_type();
-	}
-
-	// Default loop description.
-	$description = site()->title();
-	if ( configureight() ) {
-		if ( ! empty( configureight()->loop_description() ) ) {
-			$description = configureight()->loop_description();
-		}
-	}
-
-	// Default data array.
-	$data = [
-		'post_count'  => $pages->count(),
-		'show_posts'  => site()->getField( 'itemsPerPage' ),
-		'location'    => 'home',
-		'key'         => false,
-		'url'         => loop_url(),
-		'slug'        => str_replace( '/', '', site()->getField( 'uriBlog' ) ),
-		'template'    => false,
-		'type'        => $loop_type,
-		'title'       => $loop_type,
-		'description' => $description,
-		'cover'       => false,
-	];
-
-	if ( ! is_static_loop() ) {
-		return $data;
-	} else {
-
-		// Get data from the static loop page.
-		$loop_page = static_loop_page();
-
-		// Description from the static loop page.
-		if ( ! empty( $loop_page->description() ) ) {
-			$description = $loop_page->description();
-		}
-
-		$static_data = [
-			'location'    => 'page',
-			'key'         => $loop_page->key(),
-			'slug'        => $loop_page->slug(),
-			'template'    => $loop_page->template(),
-			'title'       => $loop_page->title(),
-			'description' => $description,
-			'cover'       => $loop_page->coverImage()
-		];
-		$data = array_merge( $data, $static_data );
-	}
-	return $data;
-}
-
-/**
- * Loop post count
- *
- * Gets loop post count from the loop data.
- *
- * @since  1.0.0
- * @return integer Returns the loop post count.
- */
-function loop_post_count() {
-	$loop_data = loop_data();
-	return $loop_data['post_count'];
-}
-
-/**
- * Loop show posts
- *
- * Gets loop posts per page from the loop data.
- *
- * @since  1.0.0
- * @return integer Returns the loop posts per page.
- */
-function loop_show_posts() {
-	$loop_data = loop_data();
-	return $loop_data['show_posts'];
-}
-
-/**
- * Loop location
- *
- * Gets loop location from the loop data.
- *
- * @since  1.0.0
- * @return string Returns the loop location.
- */
-function loop_location() {
-	$loop_data = loop_data();
-	return $loop_data['location'];
-}
-
-/**
- * Loop key
- *
- * Gets loop key from the loop data.
- *
- * @since  1.0.0
- * @return mixed Returns the loop key or false.
- */
-function loop_key() {
-	$loop_data = loop_data();
-	return $loop_data['key'];
-}
-
-/**
- * Loop URL
- *
- * Gets loop URL from the loop data.
- *
- * @since  1.0.0
- * @return string Returns the loop URL.
- */
-function loop_url() {
-	$loop_data = loop_data();
-	return $loop_data['url'];
-}
-
-/**
- * Loop slug
- *
- * Gets loop slug from the loop data.
- *
- * @since  1.0.0
- * @return string Returns the loop slug.
- */
-function loop_slug() {
-	$loop_data = loop_data();
-	return $loop_data['slug'];
-}
-
-/**
- * Loop template
- *
- * Gets loop template from the loop data.
- *
- * @since  1.0.0
- * @return mixed Returns the loop template or false.
- */
-function loop_template() {
-	$loop_data = loop_data();
-	return $loop_data['template'];
-}
-
-/**
- * Loop type
- *
- * Gets loop type from the loop data.
- *
- * @since  1.0.0
- * @return string Returns the loop type.
- */
-function loop_type() {
-	$loop_data = loop_data();
-	return $loop_data['type'];
-}
-
-/**
- * Loop title
- *
- * Gets loop title from the loop data.
- *
- * @since  1.0.0
- * @return string Returns the loop title.
- */
-function loop_title() {
-	$loop_data = loop_data();
-	return $loop_data['title'];
-}
-
-/**
- * Loop description
- *
- * Gets loop description from the loop data.
- *
- * @since  1.0.0
- * @return string Returns the loop description.
- */
-function loop_description() {
-	$loop_data = loop_data();
-
-	return $loop_data['description'];
-}
-
-/**
- * Loop cover image
- *
- * Gets loop cover image from the loop data.
- *
- * @since  1.0.0
- * @return mixed Returns the loop cover image or false.
- */
-function loop_cover() {
-	$loop_data = loop_data();
-	return $loop_data['cover'];
 }
 
 /**
@@ -664,1210 +428,414 @@ function is_front_page() {
 }
 
 /**
- * Configure 8 compatibility
+ * Text replace
+ *
+ * Replaces the `%replace%` variable in
+ * a language file string.
  *
  * @since  1.0.0
- * @return mixed
+ * @param  string $get The language string to get.
+ * @param  string $string The string to replace the variable.
+ * @return string Returns the modified string or the string
+ *                as is if the variable is not found.
  */
-function configureight() {
+function text_replace( $get = '', $string = '' ) {
 
-	if ( \getPlugin( 'configureight' ) ) {
-		return \getPlugin( 'configureight' );
+	if ( strstr( lang()->get( $get ), '%replace%' ) ) {
+		return str_replace( '%replace%', $string, lang()->get( $get ) );
 	}
-	return false;
+	return lang()->get( $get );
 }
 
 /**
- * User Profiles compatibility
+ * Auto paragraph
+ *
+ * Replaces double line breaks with paragraph elements.
+ *
+ * Modified from WordPress' `wpautop` function.
+ *
+ * A group of regex replaces used to identify text formatted with newlines and
+ * replace double line breaks with HTML paragraph tags. The remaining line breaks
+ * after conversion become `<br />` tags, unless `$br` is set to '0' or 'false'.
  *
  * @since  1.0.0
- * @return mixed
+ * @param  string $text The text which has to be formatted.
+ * @param  bool   $br   Optional. If set, this will convert all remaining line breaks
+ *                      after paragraphing.
+ * @return string Text which has been converted into correct paragraph tags.
  */
-function profiles() {
+function autop( $text, $br = true ) {
 
-	if ( getPlugin( 'User_Profiles' ) ) {
-		return new \User_Profiles();
-	}
-	return false;
-}
+	$pre_tags = [];
 
-/**
- * Is user
- *
- * If on a user page.
- *
- * @since  1.0.0
- * @return boolean
- */
-function is_user() {
-
-	if ( profiles() ) {
-		if ( profiles()->users_slug() == url()->whereAmI() ) {
-			return true;
-		}
-	}
-	return false;
-}
-
-/**
- * Get cover image source
- *
- * @since  1.0.0
- * @return string
- */
-function get_cover_src() {
-
-	$src     = '';
-	$default = '';
-	if ( configureight() ) {
-		if ( configureight()->cover_src() ) {
-			$default = configureight()->cover_src();
-		}
-	}
-
-	// If in loop pages.
-	if ( is_main_loop() ) {
-		if ( is_static_loop() ) {
-			$loop  = loop_data();
-			$build = buildPage( $loop['slug'] );
-			$uuid   = $build->uuid();
-			$dir    = PATH_UPLOADS_PAGES . $uuid . DS;
-			$files  = \Filesystem :: listFiles( $dir, '*', '*', true, 0 );
-			$images = [];
-
-			// Get the URL for each full-size image.
-			foreach ( $files as $file ) {
-				$images[] = DOMAIN_UPLOADS_PAGES . $uuid . '/' . str_replace( $dir, '', $file );
-			}
-
-			if ( $build->custom( 'random_cover' ) ) {
-				$rand = array_rand( $images );
-				$src  = $images[$rand];
-			} elseif ( ! empty( $loop['cover'] ) ) {
-				$src = $loop['cover'];
-			} else {
-				$src = $default;
-			}
-		} elseif ( $default ) {
-			$src = $default;
-		} elseif ( page()->coverImage() ) {
-			$src = page()->coverImage();
-		}
-
-	// If on a singular page.
-	} elseif ( is_page() ) {
-		if ( page()->coverImage() ) {
-			$src = page()->coverImage();
-		} elseif ( $default ) {
-			$src = $default;
-		}
-
-	// Default.
-	} elseif ( $default ) {
-		$src = $default;
-	}
-	return $src;
-}
-
-/**
- * Has cover image
- *
- * @since  1.0.0
- * @return boolean
- */
-function has_cover( $default = '' ) {
-
-	// Start false, conditionally true.
-	$cover = false;
-
-	// Default cover from theme plugin.
-	if ( configureight() ) {
-		if ( configureight()->cover_src() ) {
-			$default = configureight()->cover_src();
-		}
-	} else {
-		$default = get_cover_src();
-	}
-
-	// If on a singular post or page.
-	if ( is_main_loop() && ! loop_cover() ) {
-		$cover = false;
-	} elseif ( is_user() ) {
-		if ( configureight() ) {
-			if (
-				'header' == configureight()->cover_in_profile() ||
-				'both'   == configureight()->cover_in_profile()
-			) {
-				$cover = true;
-			} else {
-				$cover = false;
-			}
-		} else {
-			$cover = true;
-		}
-	} elseif ( is_page() ) {
-
-		// If the page has a cover image set.
-		if ( ! configureight() && page()->coverImage() ) {
-			$cover = true;
-		}
-
-		// False if `no-cover` template.
-		if ( str_contains( page()->template(), 'no-cover' ) ) {
-			$cover = false;
-		}
-
-		if ( configureight() ) {
-			if ( 'page' == page_type() ) {
-				if ( 'none' == configureight()->cover_in_page() ) {
-					if ( str_contains( page()->template(), 'full-cover' ) && configureight()->cover_src() ) {
-						$cover = true;
-					} elseif ( str_contains( page()->template(), 'default-cover' ) && configureight()->cover_src() ) {
-						$cover = true;
-					} elseif ( page()->custom( 'random_cover' ) && configureight()->cover_src() ) {
-						$cover = true;
-					} else {
-						$cover = false;
-					}
-				} elseif ( configureight()->cover_src() ) {
-					$cover = true;
-				}
-			} else {
-				if ( 'none' == configureight()->cover_in_post() ) {
-					if ( str_contains( page()->template(), 'full-cover' ) && configureight()->cover_src() ) {
-						$cover = true;
-					} elseif ( str_contains( page()->template(), 'default-cover' ) && configureight()->cover_src() ) {
-						$cover = true;
-					} elseif ( page()->custom( 'random_cover' ) && configureight()->cover_src() ) {
-						$cover = true;
-					} else {
-						$cover = false;
-					}
-				} elseif ( configureight()->cover_src() ) {
-					$cover = true;
-				}
-			}
-
-		// If the theme plugin has a default cover image set.
-		} elseif ( ! empty( $default ) ) {
-
-			if ( filter_var( $default, FILTER_VALIDATE_URL ) ) {
-				$cover = true;
-			} elseif ( file_exists( THEME_DIR . $default ) ) {
-				$cover = true;
-			}
-
-			// False if `no-cover` template.
-			if ( str_contains( page()->template(), 'no-cover' ) ) {
-				$cover = false;
-			}
-		}
-
-	// If on a loop page.
-	} elseif ( $default ) {
-
-		if ( filter_var( $default, FILTER_VALIDATE_URL ) ) {
-			$cover = true;
-		} elseif ( file_exists( THEME_DIR . $default ) ) {
-			$cover = true;
-		}
-	}
-	return $cover;
-}
-
-/**
- * Page description
- *
- * Gets the page description or
- * an excerpt of the content.
- *
- * @since  1.0.0
- * @return string Returns the description.
- */
-function page_description( $key = '' ) {
-
-	if ( empty( $key ) ) {
-		$key = page()->key();
-	}
-
-	$page = buildPage( $key );
-
-	if ( $page->description() ) {
-		$page_desc = $page->description();
-	} else {
-		$page_desc  = substr( strip_tags( $page->content() ), 0, 85 );
-		if ( ! empty( $page->content() ) && ! ctype_space( $page->content() ) ) {
-			$page_desc .= '&hellip;';
-		}
-	}
-	return $page_desc;
-}
-
-/**
- * Frontend title tag
- *
- * @since  1.0.0
- * @global object $categories The Categories class.
- * @global object $L The Language class.
- * @global object $page The Page class.
- * @global object $site The Site class.
- * @global object $tags The Tags class.
- * @global object $url The Url class.
- * @return string Returns the meta tag.
- */
-function title_tag() {
-
-	global $categories, $L, $page, $site, $tags, $url;
-
-	// Title separator.
-	$sep = plugin()->dbFields['title_sep'];
-	if ( 'custom' == plugin()->title_sep() && plugin()->custom_sep() ) {
-		$sep = plugin()->custom_sep();
-	} elseif ( 'custom' != plugin()->title_sep() ) {
-		$sep = plugin()->title_sep();
-	}
-
-	// Loop name.
-	$loop_name = '';
-	if ( 'blog' == $url->whereAmI() ) {
-		if ( ! is_static_loop() ) {
-			if ( configureight()->loop_title() ) {
-				$loop_name = ucwords( configureight()->loop_title() );
-			} elseif ( $site->uriBlog() ) {
-				$loop_name = ucwords( str_replace( [ '/', '-', '_' ], '', $site->uriBlog() ) );
-			} else {
-				$loop_name = ucwords( configureight()->loop_type() );
-			}
-		}
-	}
-
-	// Loop page.
-	$loop_page = '';
-	$loop_sep  = '>';
-	if ( is_rtl() ) {
-		$loop_sep  = '<';
-	}
-	if ( isset( $_GET['page'] ) && $_GET['page'] > 1 ) {
-		$loop_page = sprintf(
-			' %s %s %s',
-			$loop_sep,
-			$L->get( 'Page' ),
-			$_GET['page']
-		);
-		if ( is_rtl() ) {
-			$loop_page = sprintf(
-				'%s %s %s ',
-				$_GET['page'],
-				$L->get( 'Page' ),
-				$loop_sep
-			);
-		}
-	}
-
-	// Default title.
-	if ( is_rtl() && plugin()->default_ttag_rtl() ) {
-		$format = plugin()->default_ttag_rtl();
-	} elseif ( plugin()->default_ttag() ) {
-		$format = plugin()->default_ttag();
-	} else {
-		$format = sprintf(
-			'%s %s %s',
-			$site->title(),
-			$site->slogan() ? $sep : '',
-			$site->slogan()
-		);
-		if ( is_rtl() ) {
-			$format = sprintf(
-				'%s %s %s',
-				$site->slogan(),
-				$site->slogan() ? $sep : '',
-				$site->title()
-			);
-		}
-	}
-
-	// Default 404 page.
-	if ( $url->notFound() && ! $site->pageNotFound() ) {
-
-		if ( is_rtl() && plugin()->error_ttag_rtl() ) {
-			$format = plugin()->error_ttag_rtl();
-		} elseif ( plugin()->error_ttag() ) {
-			$format = plugin()->error_ttag();
-		} else {
-			$format = sprintf(
-				'%s %s %s',
-				$L->get( 'URL Error: Page Not Found' ),
-				$sep,
-				$site->title()
-			);
-			if ( is_rtl() ) {
-				$format = sprintf(
-					'%s %s %s',
-					$site->title(),
-					$sep,
-					$L->get( 'URL Error: Page Not Found' )
-				);
-			}
-		}
-
-	// Posts loop.
-	} elseif ( 'blog' == $url->whereAmI() ) {
-
-		if ( is_rtl() && plugin()->loop_ttag_rtl() ) {
-			$format = plugin()->loop_ttag_rtl();
-		} elseif ( plugin()->loop_ttag() ) {
-			$format = plugin()->loop_ttag();
-
-		} elseif ( is_static_loop() ) {
-			$static_loop = static_loop_page();
-			$format = sprintf(
-				'%s%s %s %s',
-				ucwords( $static_loop->title() ),
-				$loop_page,
-				$sep,
-				$site->title()
-			);
-			if ( is_rtl() ) {
-				$format = sprintf(
-					'%s %s %s%s',
-					$site->title(),
-					$sep,
-					$loop_page,
-					ucwords( $static_loop->title() )
-				);
-			}
-		} else {
-			$format = sprintf(
-				'%s%s %s %s',
-				$loop_name,
-				$loop_page,
-				$sep,
-				$site->title()
-			);
-			if ( is_rtl() ) {
-				$format = sprintf(
-					'%s %s %s%s',
-					$site->title(),
-					$sep,
-					$loop_page,
-					$loop_name
-				);
-			}
-		}
-
-	// Static home page.
-	} elseif ( is_front_page() ) {
-		$format = sprintf(
-			'%s %s %s',
-			$site->title(),
-			$sep,
-			$site->slogan()
-		);
-		if ( is_rtl() ) {
-			$format = sprintf(
-				'%s %s %s',
-				$site->slogan(),
-				$sep,
-				$site->title()
-			);
-		}
-
-	// Post or page.
-	} elseif ( 'page' == $url->whereAmI() ) {
-
-		// Page (static).
-		if ( $page->isStatic() ) {
-			if ( is_rtl() && plugin()->page_ttag_rtl() ) {
-				$format = plugin()->page_ttag_rtl();
-			} elseif ( plugin()->page_ttag() ) {
-					$format = plugin()->page_ttag();
-			} else {
-				$format = sprintf(
-					'%s %s %s',
-					$page->title(),
-					$sep,
-					$site->title()
-				);
-				if ( is_rtl() ) {
-					$format = sprintf(
-						'%s %s %s',
-						$site->title(),
-						$sep,
-						$page->title()
-					);
-				}
-			}
-		} else {
-			if ( is_rtl() && plugin()->post_ttag_rtl() ) {
-				$format = plugin()->post_ttag_rtl();
-			} elseif ( plugin()->post_ttag() ) {
-					$format = plugin()->post_ttag();
-			} else {
-				$format = sprintf(
-					'%s %s %s %s %s',
-					$page->title(),
-					$sep,
-					$page->date(),
-					$sep,
-					$site->title()
-				);
-				if ( is_rtl() ) {
-					$format = sprintf(
-						'%s %s %s %s %s',
-						$site->title(),
-						$sep,
-						$page->date(),
-						$sep,
-						$page->title()
-					);
-				}
-			}
-		}
-		$format = str_replace( '{{page-title}}', $page->title(), $format );
-		$format = str_replace( '{{page-description}}', $page->description(), $format );
-		$format = str_replace( '{{published}}', $page->date(), $format );
-
-	// Category loop.
-	} elseif ( 'category' == $url->whereAmI() ) {
-		try {
-			$key    = $url->slug();
-			$cat    = new \Category( $key );
-
-			if ( is_rtl() && plugin()->cat_ttag_rtl() ) {
-				$format = plugin()->cat_ttag_rtl();
-			} elseif ( plugin()->cat_ttag() ) {
-					$format = plugin()->cat_ttag();
-			} else {
-				$format = sprintf(
-					'%s %s %s',
-					$cat->name(),
-					$sep,
-					$site->title()
-				);
-				if ( is_rtl() ) {
-					$format = sprintf(
-						'%s %s %s',
-						$site->title(),
-						$sep,
-						$cat->name()
-					);
-				}
-			}
-			$format = str_replace( '{{category-name}}', $cat->name(), $format );
-		} catch ( \Exception $e ) {
-			// Category doesn't exist.
-		}
-
-	// Tag loop.
-	} elseif ( 'tag' == $url->whereAmI() ) {
-		try {
-			$key    = $url->slug();
-			$tag    = new \Tag( $key );
-
-			if ( is_rtl() && plugin()->tag_ttag_rtl() ) {
-				$format = plugin()->tag_ttag_rtl();
-			} elseif ( plugin()->tag_ttag() ) {
-					$format = plugin()->tag_ttag();
-			} else {
-				$format = sprintf(
-					'%s %s %s',
-					$tag->name(),
-					$sep,
-					$site->title()
-				);
-				if ( is_rtl() ) {
-					$format = sprintf(
-						'%s %s %s',
-						$site->title(),
-						$sep,
-						$tag->name()
-					);
-				}
-			}
-			$format = str_replace( '{{tag-name}}', $tag->name(), $format );
-		} catch ( \Exception $e ) {
-			// Tag doesn't exist.
-		}
-
-	} elseif ( 'search' == $url->whereAmI() ) {
-
-		$slug  = $url->slug();
-		$terms = '';
-		if ( str_contains( $slug, 'search/' ) ) {
-			$terms = str_replace( 'search/', '', $slug );
-			$terms = str_replace( '+', ' ', $terms );
-		}
-
-		if ( is_rtl() && plugin()->search_ttag_rtl() ) {
-			$format = plugin()->search_ttag_rtl();
-		} elseif ( plugin()->search_ttag() ) {
-				$format = plugin()->search_ttag();
-		} else {
-			$format = sprintf(
-				'%s "%s" %s %s',
-				$L->get( 'Searching' ),
-				$terms,
-				$sep,
-				$site->title()
-			);
-			if ( is_rtl() ) {
-				$format = sprintf(
-					'%s %s "%s" %s',
-					$site->title(),
-					$sep,
-					$terms,
-					$L->get( 'Searching' )
-				);
-			}
-		}
-		$format = str_replace( '{{search-terms}}', $terms, $format );
-	}
-
-	$format = str_replace( '{{separator}}', $sep, $format );
-	$format = str_replace( '{{site-title}}', $site->title(), $format );
-	$format = str_replace( '{{site-slogan}}', $site->slogan(), $format );
-	$format = str_replace( '{{site-description}}', $site->description(), $format );
-	$format = str_replace( '{{loop-type}}', ucwords( configureight()->loop_type() ), $format );
-	$format = str_replace( '{{page-number}}', $loop_page, $format );
-
-	$title = sprintf(
-		'<title dir="%s">%s</title>',
-		is_rtl() ? 'rtl' : 'ltr',
-		$format
-	);
-	return $title;
-}
-
-/**
- * Get keywords
- *
- * Converts each line of the textarea field
- * to an array value.
- *
- * @since  1.0.0
- * @return mixed Returns a simple array or
- *               an empty string.
- */
-function get_keywords() {
-
-	// Get the content of the keywords option.
-	$option = plugin()->meta_keywords();
-
-	// Return an empty string if the option is empty or only contains spaces.
-	if ( 0 == strlen( $option ) || ctype_space( $option ) ) {
+	if ( trim( $text ) === '' ) {
 		return '';
 	}
 
-	/**
-	 * Convert each new line of the option to an array value,
-	 * removing any carriage return entities.
+	// Just to make things a little easier, pad the end.
+	$text = $text . "\n";
+
+	/*
+	 * Pre tags shouldn't be touched by autop.
+	 * Replace pre tags with placeholders and bring them back after autop.
 	 */
-	$keywords = explode( "\n", str_replace( "\r", '', $option ) );
+	if ( str_contains( $text, '<pre' ) ) {
+		$text_parts = explode( '</pre>', $text );
+		$last_part  = array_pop( $text_parts );
+		$text       = '';
+		$i          = 0;
 
-	// Return an array of keywords or phrases.
-	return $keywords;
-}
+		foreach ( $text_parts as $text_part ) {
+			$start = strpos( $text_part, '<pre' );
 
-/**
- * Keywords
- *
- * Converts the array of keywords or phrases
- * to a comma-separated string.
- *
- * @since  1.0.0
- * @return string Returns a comma-separated string of
- *                keywords or phrases, or an empty string.
- */
-function keywords() {
+			// Malformed HTML?
+			if ( false === $start ) {
+				$text .= $text_part;
+				continue;
+			}
 
-	// Get keywords.
-	$keywords = get_keywords();
+			$name = "<pre pre-tag-$i></pre>";
+			$pre_tags[ $name ] = substr( $text_part, $start ) . '</pre>';
 
-	// Convert keywords array to a comma-separated string.
-	if ( is_array( $keywords ) ) {
-		$keywords = implode( ', ', $keywords );
-	}
-
-	// Return the comma-separated string of keywords or empty.
-	return $keywords;
-}
-
-/**
- * Meta URL
- *
- * @since  1.0.0
- * @return string
- */
-function meta_url() {
-
-	// Default to site domain.
-	$url = site_domain();
-
-	if ( is_front_page() ) {
-		$url = site_domain();
-
-	} elseif ( is_main_loop() && is_static_loop() ) {
-		$url = DOMAIN_BASE . static_loop_page()->slug() . '/';
-
-	} elseif ( is_main_loop() && is_loop_not_home() ) {
-		$url = DOMAIN_BASE . str_replace( '/', '', site()->getField( 'uriBlog' ) ) . '/';
-
-	} elseif ( is_page() ) {
-		$url = site_domain() . url()->slug();
-
-	} elseif ( is_cat() ) {
-		$url = DOMAIN_CATEGORIES . url()->slug();
-
-	} elseif ( is_tag() ) {
-		$url = DOMAIN_TAGS . url()->slug();
-
-	} elseif ( is_search() ) {
-		$url = site_domain() . 'search/';
-	}
-	return $url;
-}
-
-/**
- * Meta title
- *
- * @since  1.0.0
- * @return string
- */
-function meta_title() {
-
-	// Title separator.
-	$separator = '|';
-	if ( plugin() ) {
-		$separator = plugin()->title_sep();
-	}
-
-	// Default to site title.
-	$title = site()->title();
-
-	if ( is_page() ) {
-		$title = sprintf(
-			'%s %s %s',
-			$title = page()->title(),
-			$separator,
-			site()->title()
-		);
-
-	} elseif ( is_main_loop() ) {
-		$title = sprintf(
-			'%s %s %s',
-			configureight()->loop_title(),
-			$separator,
-			site()->title()
-		);
-
-	} elseif ( is_cat() ) {
-		$title = sprintf(
-			'%s %s %s',
-			lang()->get( 'Category Index' ),
-			$separator,
-			site()->title()
-		);
-
-	} elseif ( is_tag() ) {
-		$title = sprintf(
-			'%s %s %s',
-			lang()->get( 'Tag Index' ),
-			$separator,
-			site()->title()
-		);
-
-	} elseif ( is_search() ) {
-		$title = sprintf(
-			'%s %s %s',
-			lang()->get( 'Search Results' ),
-			$separator,
-			site()->title()
-		);
-	}
-	return $title;
-}
-
-/**
- * Meta description
- *
- * @since  1.0.0
- * @return string
- */
-function meta_description() {
-
-	// Default description.
-	$desc = '';
-	if ( site()->description() ) {
-		$desc = site()->description();
-	} elseif ( site()->slogan() ) {
-		$desc = site()->slogan();
-	}
-
-	if ( is_page() ) {
-		$desc = page_description( page()->key() );
-
-	} elseif ( is_home() || is_main_loop() ) {
-		$desc = loop_description();
-
-	} elseif ( is_cat() ) {
-		$cat  = new \Category( url()->slug() );
-		$desc = lang()->get( "Posts in the {$cat->name()} category" );
-
-	} elseif ( is_tag() ) {
-		$tag  = new \Tag( url()->slug() );
-		$desc = lang()->get( "Posts tagged '{$tag->name()}'" );
-
-	} elseif ( is_search() ) {
-
-		$slug  = url()->slug();
-		$terms = '';
-		if ( str_contains( $slug, 'search/' ) ) {
-			$terms = str_replace( 'search/', '', $slug );
-			$terms = str_replace( '+', ' ', $terms );
+			$text .= substr( $text_part, 0, $start ) . $name;
+			++$i;
 		}
-		$desc = lang()->get( "Searching '{$terms}'" );
+		$text .= $last_part;
 	}
-	return $desc;
+
+	// Change multiple <br>'s into two line breaks, which will turn into paragraphs.
+	$text = preg_replace( '|<br\s*/?>\s*<br\s*/?>|', "\n\n", $text );
+
+	$allblocks = '(?:table|thead|tfoot|caption|col|colgroup|tbody|tr|td|th|div|dl|dd|dt|ul|ol|li|pre|form|map|area|blockquote|address|style|p|h[1-6]|hr|fieldset|legend|section|article|aside|hgroup|header|footer|nav|figure|figcaption|details|menu|summary)';
+
+	// Add a double line break above block-level opening tags.
+	$text = preg_replace( '!(<' . $allblocks . '[\s/>])!', "\n\n$1", $text );
+
+	// Add a double line break below block-level closing tags.
+	$text = preg_replace( '!(</' . $allblocks . '>)!', "$1\n\n", $text );
+
+	// Add a double line break after hr tags, which are self closing.
+	$text = preg_replace( '!(<hr\s*?/?>)!', "$1\n\n", $text );
+
+	// Standardize newline characters to "\n".
+	$text = str_replace( [ "\r\n", "\r" ], "\n", $text );
+
+	// Collapse line breaks before and after <option> elements so they don't get autop'd.
+	if ( str_contains( $text, '<option' ) ) {
+		$text = preg_replace( '|\s*<option|', '<option', $text );
+		$text = preg_replace( '|</option>\s*|', '</option>', $text );
+	}
+
+	/*
+	 * Collapse line breaks inside <object> elements, before <param> and <embed> elements
+	 * so they don't get autop'd.
+	 */
+	if ( str_contains( $text, '</object>' ) ) {
+		$text = preg_replace( '|(<object[^>]*>)\s*|', '$1', $text );
+		$text = preg_replace( '|\s*</object>|', '</object>', $text );
+		$text = preg_replace( '%\s*(</?(?:param|embed)[^>]*>)\s*%', '$1', $text );
+	}
+
+	/*
+	 * Collapse line breaks inside <audio> and <video> elements,
+	 * before and after <source> and <track> elements.
+	 */
+	if ( str_contains( $text, '<source' ) || str_contains( $text, '<track' ) ) {
+		$text = preg_replace( '%([<\[](?:audio|video)[^>\]]*[>\]])\s*%', '$1', $text );
+		$text = preg_replace( '%\s*([<\[]/(?:audio|video)[>\]])%', '$1', $text );
+		$text = preg_replace( '%\s*(<(?:source|track)[^>]*>)\s*%', '$1', $text );
+	}
+
+	// Collapse line breaks before and after <figcaption> elements.
+	if ( str_contains( $text, '<figcaption' ) ) {
+		$text = preg_replace( '|\s*(<figcaption[^>]*>)|', '$1', $text );
+		$text = preg_replace( '|</figcaption>\s*|', '</figcaption>', $text );
+	}
+
+	// Remove more than two contiguous line breaks.
+	$text = preg_replace( "/\n\n+/", "\n\n", $text );
+
+	// Split up the contents into an array of strings, separated by double line breaks.
+	$paragraphs = preg_split( '/\n\s*\n/', $text, -1, PREG_SPLIT_NO_EMPTY );
+
+	// Reset $text prior to rebuilding.
+	$text = '';
+
+	// Rebuild the content as a string, wrapping every bit with a <p>.
+	foreach ( $paragraphs as $paragraph ) {
+		$text .= '<p>' . trim( $paragraph, "\n" ) . "</p>\n";
+	}
+
+	// Under certain strange conditions it could create a P of entirely whitespace.
+	$text = preg_replace( '|<p>\s*</p>|', '', $text );
+
+	// Add a closing <p> inside <div>, <address>, or <form> tag if missing.
+	$text = preg_replace( '!<p>([^<]+)</(div|address|form)>!', '<p>$1</p></$2>', $text );
+
+	// If an opening or closing block element tag is wrapped in a <p>, unwrap it.
+	$text = preg_replace( '!<p>\s*(</?' . $allblocks . '[^>]*>)\s*</p>!', '$1', $text );
+
+	// In some cases <li> may get wrapped in <p>, fix them.
+	$text = preg_replace( '|<p>(<li.+?)</p>|', '$1', $text );
+
+	// If a <blockquote> is wrapped with a <p>, move it inside the <blockquote>.
+	$text = preg_replace( '|<p><blockquote([^>]*)>|i', '<blockquote$1><p>', $text );
+	$text = str_replace( '</blockquote></p>', '</p></blockquote>', $text );
+
+	// If an opening or closing block element tag is preceded by an opening <p> tag, remove it.
+	$text = preg_replace( '!<p>\s*(</?' . $allblocks . '[^>]*>)!', '$1', $text );
+
+	// If an opening or closing block element tag is followed by a closing <p> tag, remove it.
+	$text = preg_replace( '!(</?' . $allblocks . '[^>]*>)\s*</p>!', '$1', $text );
+
+	// Optionally insert line breaks.
+	if ( $br ) {
+
+		// Normalize <br>
+		$text = str_replace( [ '<br>', '<br/>' ], '<br />', $text );
+
+		// Replace any new line characters that aren't preceded by a <br /> with a <br />.
+		$text = preg_replace( '|(?<!<br />)\s*\n|', "<br />\n", $text );
+	}
+
+	// If a <br /> tag is after an opening or closing block tag, remove it.
+	$text = preg_replace( '!(</?' . $allblocks . '[^>]*>)\s*<br />!', '$1', $text );
+
+	// If a <br /> tag is before a subset of opening or closing block tags, remove it.
+	$text = preg_replace( '!<br />(\s*</?(?:p|li|div|dl|dd|dt|th|pre|td|ul|ol)[^>]*>)!', '$1', $text );
+	$text = preg_replace( "|\n</p>$|", '</p>', $text );
+
+	// Replace placeholder <pre> tags with their original content.
+	if ( ! empty( $pre_tags ) ) {
+		$text = str_replace( array_keys( $pre_tags ), array_values( $pre_tags ), $text );
+	}
+
+	return $text;
 }
 
 /**
- * Meta author
+ * Read numbers
+ *
+ * Converts an integer to its textual representation.
  *
  * @since  1.0.0
- * @return string
+ * @param  integer $number the number to convert to a textual representation
+ * @param  integer $depth the number of times this has been recursed
+ * @return string Returns a word corresponding to a numeral
  */
-function meta_author() {
+function numbers_to_text( $number, $depth = 0 ) {
 
-	// Empty if not on a page.
-	if ( ! is_page() ) {
-		return '';
+	$number = (int)$number;
+	$text   = '';
+
+	// If it's any other negative, just flip it and call again.
+	if ( $number < 0 ) {
+		return 'negative ' + numbers_to_text( - $number, 0 );
 	}
 
-	// Get user name.
-	$user   = page()->user();
-	$author = ucwords( page()->username() );
-	if ( $user->nickname() ) {
-		$author = $user->nickname();
-	}
-	return $author;
-}
+	// 100 and above.
+	if ( $number > 99 ) {
 
-/**
- * Meta language tag
- *
- * @since  1.0.0
- * @return string
- */
-function meta_tag_language( $print = true ) {
-
-	if ( $print ) {
-		printf(
-			'<meta name="language" content="%s" />',
-			current_lang()
-		) . "\r";
-	} else {
-		return sprintf(
-			'<meta name="language" content="%s" />',
-			current_lang()
-		) . "\r";
-	}
-}
-
-/**
- * Meta keywords tag
- *
- * @since  1.0.0
- * @return string
- */
-function meta_tag_keywords( $print = true ) {
-
-	if ( $print ) {
-		printf(
-			'<meta name="keywords" content="%s" />',
-			keywords()
-		) . "\r";
-	} else {
-		return sprintf(
-			'<meta name="keywords" content="%s" />',
-			keywords()
-		) . "\r";
-	}
-}
-
-/**
- * Meta title tag
- *
- * @since  1.0.0
- * @return string
- */
-function meta_tag_title( $print = true ) {
-
-	if ( $print ) {
-		printf(
-			'<meta name="title" content="%s" />',
-			meta_title()
-		) . "\r";
-	} else {
-		return sprintf(
-			'<meta name="title" content="%s" />',
-			meta_title()
-		) . "\r";
-	}
-}
-
-/**
- * Meta description tag
- *
- * @since  1.0.0
- * @return string
- */
-function meta_tag_description( $print = true ) {
-
-	if ( $print ) {
-		printf(
-			'<meta name="description" content="%s" />',
-			meta_description()
-		) . "\r";
-	} else {
-		return sprintf(
-			'<meta name="description" content="%s" />',
-			meta_description()
-		) . "\r";
-	}
-}
-
-/**
- * Meta author tag
- *
- * @since  1.0.0
- * @return string
- */
-function meta_tag_author( $print = true ) {
-
-	if ( $print ) {
-		printf(
-			'<meta name="author" content="%s" />',
-			meta_author()
-		) . "\r";
-	} else {
-		return sprintf(
-			'<meta name="author" content="%s" />',
-			meta_author()
-		) . "\r";
-	}
-}
-
-/**
- * Meta copyright tag
- *
- * @since  1.0.0
- * @return string
- */
-function meta_tag_copyright( $print = true ) {
-
-	if ( $print ) {
-		printf(
-			'<meta name="copyright" content="%s" />',
-			date( 'Y' )
-		) . "\r";
-	} else {
-		return sprintf(
-			'<meta name="copyright" content="%s" />',
-			date( 'Y' )
-		) . "\r";
-	}
-}
-
-/**
- * Meta tags: standard
- *
- * @since  1.0.0
- * @return string
- */
-function meta_tags_standard() {
-
-	$html = '<!-- Standard meta tags -->' . "\r";
-
-	// Language tag.
-	$html .= meta_tag_language( false );
-
-	// Keywords tag.
-	if ( ! empty( keywords() ) ) {
-		$html .= meta_tag_keywords( false );
-	}
-
-	// Title tag.
-	$html .= meta_tag_title( false );
-
-	// Description tag.
-	$html .= meta_tag_description( false );
-
-	// Author tag.
-	if ( is_page() ) {
-		$html .= meta_tag_author( false );
-	}
-
-	// Copyright tag.
-	$html .= meta_tag_copyright( false );
-
-	return $html;
-}
-
-/**
- * Meta tags: Schema
- *
- * @since  1.0.0
- * @return string
- */
-function meta_tags_schema() {
-
-	$html = "\r" . '<!-- Schema meta tags -->' . "\r";
-
-	// URL tag.
-	$html .= sprintf(
-		'<meta itemprop="url" content="%s" />',
-		meta_url()
-	) . "\r";
-
-	// Name (title) tag.
-	$html .= sprintf(
-		'<meta itemprop="name" content="%s" />',
-		meta_title()
-	) . "\r";
-
-	// Description tag.
-	$html .= sprintf(
-		'<meta itemprop="description" content="%s" />',
-		meta_description()
-	) . "\r";
-
-	// Post/page tags.
-	if ( is_page() ) {
-		$html .= sprintf(
-			'<meta itemprop="author" content="%s" />',
-			meta_author()
-		) . "\r";
-		$html .= sprintf(
-			'<meta itemprop="datePublished" content="%s" />',
-			page()->date()
-		) . "\r";
-		$html .= sprintf(
-			'<meta itemprop="dateModified" content="%s" />',
-			page()->dateModified()
-		) . "\r";
-	}
-
-	// Image tag.
-	if ( has_cover() ) {
-		$html .= sprintf(
-			'<meta itemprop="image" content="%s" />',
-			get_cover_src()
-		) . "\r";
-	}
-	return $html;
-}
-
-/**
- * Meta tags: Open Graph
- *
- * @since  1.0.0
- * @return string
- */
-function meta_tags_open_graph() {
-
-	$html = "\r" . '<!-- Open Graph meta tags -->' . "\r";
-
-	// URL tag.
-	$html .= sprintf(
-		'<meta property="og:url" content="%s" />',
-		meta_url()
-	) . "\r";
-
-	// Language tag.
-	$html .= sprintf(
-		'<meta property="og:locale" content="%s" />',
-		current_lang()
-	) . "\r";
-
-	// Type tag.
-	$html .= sprintf(
-		'<meta property="og:type" content="%s" />',
-		( is_page() ? 'article' : 'website' )
-	) . "\r";
-
-	// Site title.
-	$html .= sprintf(
-		'<meta property="og:site_name" content="%s" />',
-		site()->title()
-	) . "\r";
-
-	// Content title.
-	$html .= sprintf(
-		'<meta property="og:title" content="%s" />',
-		meta_title()
-	) . "\r";
-
-	// Description tag.
-	$html .= sprintf(
-		'<meta property="og:description" content="%s" />',
-		meta_description()
-	) . "\r";
-
-	// Image tag.
-	if ( has_cover() ) {
-		$html .= sprintf(
-			'<meta property="og:image" content="%s" />',
-			get_cover_src()
-		) . "\r";
-	}
-	return $html;
-}
-
-/**
- * Meta tags: X/Twitter
- *
- * @since  1.0.0
- * @return string
- */
-function meta_tags_twitter() {
-
-	$html = "\r" . '<!-- X/Twitter meta tags -->' . "\r";
-
-	// Card tag.
-	$html .= '<meta name="twitter:card" content="summary_large_image" />' . "\r";
-
-	// Site URL tag.
-	$html .= sprintf(
-		'<meta name="twitter:domain" content="%s" />',
-		site_domain()
-	) . "\r";
-
-	// Site title.
-	$html .= sprintf(
-		'<meta name="twitter:site" content="%s" />',
-		site()->title()
-	) . "\r";
-
-	// URL tag.
-	$html .= sprintf(
-		'<meta name="twitter:url" content="%s" />',
-		meta_url()
-	) . "\r";
-
-	// Content title.
-	$html .= sprintf(
-		'<meta name="twitter:title" content="%s" />',
-		meta_title()
-	) . "\r";
-
-	// Description tag.
-	$html .= sprintf(
-		'<meta name="twitter:description" content="%s" />',
-		meta_description()
-	) . "\r";
-
-	// Image tag.
-	if ( has_cover() ) {
-		$html .= sprintf(
-			'<meta name="twitter:image:src" content="%s" />',
-			get_cover_src()
-		) . "\r";
-	}
-
-	return $html;
-}
-
-/**
- * Meta tags: Dublin Core
- *
- * @since  1.0.0
- * @return string
- */
-function meta_tags_dublin_core() {
-
-	$html  = "\r" . '<!-- Dublin Core meta tags -->' . "\r";
-	$html .= '<meta name="DC.Format" content="text/html" />' . "\r";
-
-	// Language tag.
-	$html .= sprintf(
-		'<meta name="DC.Language" content="%s" />',
-		current_lang()
-	) . "\r";
-
-	// Source tag.
-	$html .= sprintf(
-		'<meta name="DC.Source" content="%s" />',
-		site_domain()
-	) . "\r";
-
-	// Creator tag.
-	$html .= sprintf(
-		'<meta name="DC.Creator" content="%s" />',
-		site()->title()
-	) . "\r";
-
-	// Publisher tag.
-	$html .= sprintf(
-		'<meta name="DC.Publisher" content="%s" />',
-		site()->title()
-	) . "\r";
-
-	// Rights tag.
-	$html .= sprintf(
-		'<meta name="DC.Rights" content="%s" />',
-		date( 'Y' )
-	) . "\r";
-	return $html;
-
-	// Identifier tag.
-	$html .= sprintf(
-		'<meta name="DC.Identifier" content="%s" />',
-		meta_url()
-	) . "\r";
-
-	// Content title tag.
-	$html .= sprintf(
-		'<meta name="DC.Title" content="%s" />',
-		meta_title()
-	) . "\r";
-
-	if ( ! is_home() && ! is_front_page() ) {
-		// Relation tag.
-		$html .= sprintf(
-			'<meta name="DC.Relation" content="%s" scheme="IsPartOf" />',
-			meta_url()
-		) . "\r";
-	}
-
-	// Post/page tags.
-	if ( is_page() ) {
-
-		// Subject tag.
-		if ( page()->category() ) {
-			$html .= sprintf(
-				'<meta name="DC.Subject" content="%s" />',
-				page()->category()
-			) . "\r";
+		// 1000 and higher.
+		if ( $number > 999 ) {
+			$text .= numbers_to_text( $number / 1000, $depth + 3 );
 		}
 
-		// Contributor tag.
-		$html .= sprintf(
-			'<meta name="DC.Contributor" content="%s" />',
-			meta_author()
-		) . "\r";
+		// Last three digits.
+		$number %= 1000;
 
-		// Date tag.
-		$html .= sprintf(
-			'<meta name="DC.Date" content="%s" />',
-			page()->date()
-		) . "\r";
+		// As long as the first digit is not zero.
+		if ( $number > 99 ) {
+			$text .= numbers_to_text( $number / 100, 2 ) . lang()->get( ' hundred' ) . "\n";
+		}
+
+		// Last two digits.
+		$text .= numbers_to_text( $number % 100, 1 );
+
+	// From 0 to 99.
+	} else {
+
+		$mod = floor( $number / 10 );
+
+		// Ones place.
+		if ( 0 == $mod ) {
+			if ( 1 == $number ) {
+				$text .= lang()->get( 'one' );
+			} elseif ( 2 == $number ) {
+				$text .= lang()->get( 'two' );
+			} elseif ( 3 == $number ) {
+				$text .= lang()->get( 'three' );
+			} elseif ( 4 == $number ) {
+				$text .= lang()->get( 'four' );
+			} elseif ( 5 == $number ) {
+				$text .= lang()->get( 'five' );
+			} elseif ( 6 == $number ) {
+				$text .= lang()->get( 'six' );
+			} elseif ( 7 == $number ) {
+				$text .= lang()->get( 'seven' );
+			} elseif ( 8 == $number ) {
+				$text .= lang()->get( 'eight' );
+			} elseif ( 9 == $number ) {
+				$text .= lang()->get( 'nine' );
+			}
+
+		// if there's a one in the ten's place.
+		} elseif ( 1 == $mod ) {
+			if ( 10 == $number ) {
+				$text .= lang()->get( 'ten' );
+			} elseif ( 11 == $number ) {
+				$text .= lang()->get( 'eleven' );
+			} elseif ( 12 == $number ) {
+				$text .= lang()->get( 'twelve' );
+			} elseif ( 13 == $number ) {
+				$text .= lang()->get( 'thirteen' );
+			} elseif ( 14 == $number ) {
+				$text .= lang()->get( 'fourteen' );
+			} elseif ( 15 == $number ) {
+				$text .= lang()->get( 'fifteen' );
+			} elseif ( 16 == $number ) {
+				$text .= lang()->get( 'sixteen' );
+			} elseif ( 17 == $number ) {
+				$text .= lang()->get( 'seventeen' );
+			} elseif ( 18 == $number ) {
+				$text .= lang()->get( 'eighteen' );
+			} elseif ( 19 == $number ) {
+				$text .= lang()->get( 'nineteen' );
+			}
+
+		// if there's a different number in the ten's place.
+		} else {
+			if ( 2 == $mod ) {
+				$text .= lang()->get( 'twenty' );
+			} elseif ( 3 == $mod ) {
+				$text .= lang()->get( 'thirty' );
+			} elseif ( 4 == $mod ) {
+				$text .= lang()->get( 'forty' );
+			} elseif ( 5 == $mod ) {
+				$text .= lang()->get( 'fifty' );
+			} elseif ( 6 == $mod ) {
+				$text .= lang()->get( 'sixty' );
+			} elseif ( 7 == $mod ) {
+				$text .= lang()->get( 'seventy' );
+			} elseif ( 8 == $mod ) {
+				$text .= lang()->get( 'eighty' );
+			} elseif ( 9 == $mod ) {
+				$text .= lang()->get( 'ninety' );
+			}
+
+			if ( ( $number % 10 ) != 0 ) {
+
+				// Get rid of space at end.
+				$text  = rtrim( $text );
+				$text .= '-';
+			}
+			$text .= numbers_to_text( $number % 10, 0 );
+		}
 	}
 
-	// Description tag.
-	$html .= sprintf(
-		'<meta name="DC.Description" content="%s" />',
-		meta_description()
-	) . "\r";
+	if ( 0 != $number ) {
+		if ( 3 == $depth ) {
+			$text .= lang()->get( ' thousand' ) . "\n";
+		} elseif ( 6 == $depth ) {
+			$text .= lang()->get( ' million' ) . "\n";
+		}
 
-	return $html;
+		if ( 9 == $depth ) {
+			$text .= lang()->get( ' billion' ) . "\n";
+		}
+	}
+	return $text;
+}
+
+/**
+ * File size format
+ *
+ * Converts a number of bytes to the largest unit the bytes will fit into.
+ * Taken from WordPress.
+ *
+ * It is easier to read 1 KB than 1024 bytes and 1 MB than 1048576 bytes. Converts
+ * number of bytes to human readable number by taking the number of that unit
+ * that the bytes will go into it. Supports YB value.
+ *
+ * Please note that integers in PHP are limited to 32 bits, unless they are on
+ * 64 bit architecture, then they have 64 bit size. If you need to place the
+ * larger size then what PHP integer type will hold, then use a string. It will
+ * be converted to a double, which should always have 64 bit length.
+ *
+ * Technically the correct unit names for powers of 1024 are KiB, MiB etc.
+ *
+ * @since  1.0.0
+ * @param  integer|string $bytes Number of bytes. Note max integer size for integers.
+ * @param  integer $decimals Optional. Precision of number of decimal places. Default 0.
+ * @return mixed Number string on success, false on failure.
+ */
+function size_format( $bytes, $decimals = 0 ) {
+
+	// Read bytes in chunks.
+	$KB = 1024;
+	$MB = 1024 * $KB;
+	$GB = 1024 * $MB;
+	$TB = 1024 * $GB;
+
+	// Assign relevant units.
+	$units = [
+		'TB' => $TB,
+		'GB' => $GB,
+		'MB' => $MB,
+		'KB' => $KB,
+		'B'  => 1,
+	];
+
+	// Return 0 bytes if so.
+	if ( 0 === $bytes ) {
+		return '0 B';
+	}
+
+	// Return the size in relevant units.
+	foreach ( $units as $unit => $mag ) {
+		if ( (float) $bytes >= $mag ) {
+			return number_format( $bytes / $mag, abs( (int) $decimals ) ) . ' ' . $unit;
+		}
+	}
+	return false;
+}
+
+/**
+ * Hex to RGB
+ *
+ * Convert a 3- or 6-digit hexadecimal color to
+ * an associative RGB array.
+ *
+ * @param  string $color The color in hex format.
+ * @param  boolean $opacity Whether to return the RGB color as opaque.
+ * @return string Returns the rgb(a) value.
+ */
+function hex_to_rgb( $color, $opacity = false ) {
+
+	if ( empty( $color ) ) {
+		return false;
+	}
+
+	if ( '#' === $color[0] ) {
+		$color = substr( $color, 1 );
+	}
+
+	if ( 6 === strlen( $color ) ) {
+		$hex = [ $color[0] . $color[1], $color[2] . $color[3], $color[4] . $color[5] ];
+	} elseif ( 3 === strlen( $color ) ) {
+		$hex = [ $color[0] . $color[0], $color[1] . $color[1], $color[2] . $color[2] ];
+	} else {
+		return null;
+	}
+	$rgb = array_map( 'hexdec', $hex );
+
+	if ( $opacity ) {
+		if ( abs( $opacity ) > 1 ) {
+			$opacity = 1.0;
+		}
+		$output = 'rgba(' . implode( ',', $rgb ) . ',' . $opacity . ')';
+	} else {
+		$output = 'rgb(' . implode( ',', $rgb ) . ')';
+	}
+	return $output;
 }
