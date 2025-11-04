@@ -37,17 +37,17 @@ $form_page = DOMAIN_ADMIN . 'configure-plugin/' . $this->className();
 <div class="tab-content" id="nav-tabContent">
 
 	<div id="content-one" class="tab-pane fade show mt-4 active" role="tabpanel" aria-labelledby="tab-one">
-		<h2><?php lang()->p( 'Tab One' ); ?></h2>
+		<h2 class="form-heading mt-3"><?php lang()->p( 'Tab One' ); ?></h2>
 		<p><?php lang()->p( 'Tab one content.' ); ?></p>
 	</div>
 
 	<div id="content-two" class="tab-pane fade show mt-4" role="tabpanel" aria-labelledby="tab-two">
-		<h2><?php lang()->p( 'Tab Two' ); ?></h2>
+		<h2 class="form-heading mt-3"><?php lang()->p( 'Tab Two' ); ?></h2>
 		<p><?php lang()->p( 'Tab two content.' ); ?></p>
 	</div>
 
 	<div id="content-three" class="tab-pane fade show mt-4" role="tabpanel" aria-labelledby="tab-three">
-		<h2><?php lang()->p( 'Tab Three' ); ?></h2>
+		<h2 class="form-heading mt-3"><?php lang()->p( 'Tab Three' ); ?></h2>
 		<p><?php lang()->p( 'Tab three content.' ); ?></p>
 	</div>
 
