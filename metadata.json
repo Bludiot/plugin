@@ -5,7 +5,7 @@
 	"version"     : "1.0.0",
 	"releaseDate" : "",
 	"license"     : "",
-	"compatible"  : "3.16.2",
+	"compatible"  : "3.22.0",
 	"theme_compat" : [ "" ],
 	"theme_desc"   : "",
 	"notes"       : ""
